@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Kaggle Titanic\"\noutput: html_notebook\n---\n\n\n#1 Load Data\n\n```{r, Load Data}\nlibrary(\"dtplyr\")\n#Load data\ntrain <- fread(\"https://www.kaggle.com/c/titanic/download/train.csv\")\ntest <- fread(\"https://www.kaggle.com/c/titanic/download/test.csv\")\ntrain.raw <- train\ntest.raw <- test\n```\n\n#2 Describe Data\n\n\n\n```{r, Missing Data}\nlibrary(\"Amelia\")\nmissmap(train, legend = TRUE, col = c(\"wheat\", \"darkred\"))\n```\nCabin is missing a lot of data, meaning it won't be as useful. Pclass can give similar information without having to estimate values for Cabin so we will remove Cabin from our scope. Age also has missing data, but it is still fairly intact and we might be able to fill in the data based upon the name titles. Also based on historical evidence we know that there is a good chance age will be a significant predictor of survival.PassengerID is also not very useful to us as it is too unique.\n\n```{r, Removing Cabin and PassengerID}\n#use subset to select the groups that we want to work with.\ntrain <- subset(train,select=c(1,2,3,5,6,7,8,10,12))\n```\n\nWe also wanted to fix age. A \"better\" way to predict age would be to create a function that predicts age based upon titles in names. However for the sake of simplicty the mean will be used as the estimator.\n\n\n```{r, Estimate Age}\n#estimating age by taking the average.\n\ntrain$Age[is.na(train$Age)] <- mean(train$Age,na.rm=T)\nlevels(train$Age) <- levels(test$Age)\n```\n\nNow that our data has been cleaned up we can begin to investigate our model.\n\n```{r}\n#our first model\nfit <- rpart(Survived ~ Pclass + Sex + Age + Fare ,\n               data=train,\n               method=\"class\")\n```\n\n```{r, Submit}\nPrediction <-  predict(fit, test, type =\"class\")\nsubmit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)\nwrite.csv(submit, file = \"submit.csv\", row.names = FALSE)\n```\n",
+    "created" : 1496635642861.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2970365305",
+    "id" : "437BEDDA",
+    "lastKnownWriteTime" : 1496636755,
+    "last_content_update" : 1496636755649,
+    "path" : "C:/Users/Andrew Beattie/OneDrive/Main/Public/Open Project/Titanic/Titanic.Rmd",
+    "project_path" : "Titanic.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

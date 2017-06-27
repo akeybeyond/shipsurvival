@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\n#Dependencies\nlibrary(dplyr)\nlibrary(randomForest)\nlibrary(lattice)\n\n#Check Data\nhead(read.csv(\"train.csv\"))\n\n\n\ntitanic <- read.csv(\"train.csv\") %>%\n  mutate(.,Pclass=factor(Pclass),\n         Survived=factor(Survived),\n         age=ifelse(is.na(Age),35,Age),\n         age = cut(age,c(0,2,5,9,12,15,21,55,65,100)),\n         A=grepl('A',Cabin),\n         B=grepl('B',Cabin),\n         C=grepl('C',Cabin),\n         D=grepl('D',Cabin),\n         cn = as.numeric(gsub('[[:space:][:alpha:]]', \" \",Cabin)),\n         oe=factor(ifelse(!is.na(cn),cn%%2,-1)),\n         train = sample(c(TRUE,FALSE),\n                        size=891,\n                        replace=TRUE, \n                        prob=c(.9,.1)   ) )\ntest <- read.csv(\"test.csv\") %>%\n  mutate(.,Pclass=factor(Pclass),\n         age=ifelse(is.na(Age),35,Age),\n         age = cut(age,c(0,2,5,9,12,15,21,55,65,100)),\n         A=grepl('A',Cabin),\n         B=grepl('B',Cabin),\n         C=grepl('C',Cabin),\n         D=grepl('D',Cabin),\n         cn = as.numeric(gsub('[[:space:][:alpha:]]',\" \",Cabin)),\n         oe=factor(ifelse(!is.na(cn),cn%%2,-1)),\n         Embarked=factor(Embarked,levels=levels(titanic$Embarked))\n  )\ntest$Fare[is.na(test$Fare)]<- median(titanic$Fare)\n\n\nrf1 <- randomForest(Survived ~ \n                      Sex+Pclass + SibSp +\n                      Parch + Fare + \n                      Embarked + age +\n                      A+B+C+D +oe,\n                    data=titanic,\n                    subset=train,\n                    replace=FALSE,\n                    ntree=1000)\n\n",
+    "created" : 1496635687068.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4241806851",
+    "id" : "10940A6B",
+    "lastKnownWriteTime" : 1494297511,
+    "last_content_update" : 1494297511,
+    "path" : "C:/Users/Andrew Beattie/OneDrive/Main/Public/Open Project/Titanic/Titanic.R",
+    "project_path" : "Titanic.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
